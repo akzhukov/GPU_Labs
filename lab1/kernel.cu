@@ -16,7 +16,7 @@
 using namespace std;
 
 
-__global__ void matrixMult(double* A, double* B, double* C, size_t size)
+__global__ void matrixMult(double* __restrict__ A, double* __restrict__ B, double* __restrict__ C, size_t size)
 {
 	size_t i = blockDim.y * blockIdx.y + threadIdx.y;
 	size_t j = blockDim.x * blockIdx.x + threadIdx.x;
@@ -42,7 +42,7 @@ float matrixMulOnGPU(double* A, double* B, double* C, size_t size) {
 	float time;
 
 	dim3 threads(BLOCK_SIZE, BLOCK_SIZE);
-	dim3 blocks((size) / threads.x + 1, (size) / threads.y + 1);
+	dim3 blocks((size + threads.x - 1) / threads.x, (size + threads.y - 1) / threads.y);
 
 	cudaMalloc((void**)(&dA), numBytes);
 	cudaMalloc((void**)(&dB), numBytes);
